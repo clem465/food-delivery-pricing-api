@@ -4,6 +4,7 @@ from src.utils import (
     capitalize,
     clamp,
     slugify,
+    sort_students,
 )
 
 # CAPITALIZE
@@ -87,3 +88,85 @@ def test_should_return_maximum_when_above_range():
 
 def test_should_handle_equal_bounds():
     assert clamp(0, 0, 0) == 0
+
+def test_should_sort_students_by_grade_ascending():
+    # Arrange
+    students = [
+        {"name": "Alice", "grade": 15, "age": 20},
+        {"name": "Bob", "grade": 10, "age": 22},
+        {"name": "Charlie", "grade": 18, "age": 19},
+    ]
+
+    # Act
+    result = sort_students(students, "grade", "asc")
+
+    # Assert
+    assert [student["grade"] for student in result] == [
+        10, 15, 18
+    ]
+    
+def test_should_sort_students_by_grade_descending():
+    students = [
+        {"name": "Alice", "grade": 15, "age": 20},
+        {"name": "Bob", "grade": 10, "age": 22},
+        {"name": "Charlie", "grade": 18, "age": 19},
+    ]
+
+    result = sort_students(students, "grade", "desc")
+
+    assert [s["grade"] for s in result] == [18, 15, 10]
+
+def test_should_sort_students_by_name_ascending():
+    students = [
+        {"name": "Charlie", "grade": 18, "age": 19},
+        {"name": "Alice", "grade": 15, "age": 20},
+        {"name": "Bob", "grade": 10, "age": 22},
+    ]
+
+    result = sort_students(students, "name", "asc")
+
+    assert [s["name"] for s in result] == [
+        "Alice", "Bob", "Charlie"
+    ]
+
+def test_should_sort_students_by_age_ascending():
+    students = [
+        {"name": "Alice", "grade": 15, "age": 20},
+        {"name": "Bob", "grade": 10, "age": 22},
+        {"name": "Charlie", "grade": 18, "age": 19},
+    ]
+
+    result = sort_students(students, "age", "asc")
+
+    assert [s["age"] for s in result] == [19, 20, 22]
+
+def test_should_return_empty_array_when_students_null():
+    assert sort_students(None, "grade") == []
+
+def test_should_return_empty_array_when_students_empty():
+    assert sort_students([], "grade") == []
+
+def test_should_not_modify_original_students():
+    students = [
+        {"name": "Bob", "grade": 10, "age": 22},
+        {"name": "Alice", "grade": 15, "age": 20},
+    ]
+
+    original = [student.copy() for student in students]
+
+    sort_students(students, "name", "asc")
+
+    assert students == original
+
+def test_should_default_to_ascending_order():
+    students = [
+        {"name": "Charlie", "grade": 18, "age": 19},
+        {"name": "Alice", "grade": 15, "age": 20},
+        {"name": "Bob", "grade": 10, "age": 22},
+    ]
+
+    result = sort_students(students, "name")
+
+    assert [s["name"] for s in result] == [
+        "Alice", "Bob", "Charlie"
+    ]

@@ -36,3 +36,28 @@ def slugify(text):
 
 def clamp(value, minimum, maximum):
     return max(minimum, min(value, maximum))
+
+
+def sort_students(students, sort_by, order="asc"):
+    """
+    Trie les étudiants par name, grade ou age.
+
+    Retourne un nouveau tableau sans modifier l'original.
+    """
+    if not students:
+        return []
+
+    if sort_by not in ("name", "grade", "age"):
+        raise ValueError("Critère de tri invalide")
+
+    if order not in ("asc", "desc"):
+        raise ValueError("Ordre de tri invalide")
+
+    reverse = order == "desc"
+
+    return sorted(
+        students,
+        key=lambda student: student[sort_by],
+        reverse=reverse,
+    )
+
