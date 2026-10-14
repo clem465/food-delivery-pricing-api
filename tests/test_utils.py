@@ -3,6 +3,7 @@ from src.utils import (
     calculate_average,
     capitalize,
     clamp,
+    group_by,
     parse_price,
     slugify,
     sort_students,
@@ -211,3 +212,51 @@ def test_should_reject_null_price():
 
 def test_should_reject_boolean_price():
     assert parse_price(True) is None
+
+
+def test_should_group_by_role():
+    users = [
+        {"name": "Alice", "role": "dev"},
+        {"name": "Bob", "role": "design"},
+        {"name": "Charlie", "role": "dev"},
+    ]
+
+    result = group_by(users, "role")
+
+    assert len(result["dev"]) == 2
+    assert len(result["design"]) == 1
+    assert result["dev"][0]["name"] == "Alice"
+
+
+def test_should_return_empty_groups_when_empty():
+    assert group_by([], "role") == {}
+
+
+def test_should_return_empty_groups_when_null():
+    assert group_by(None, "role") == {}
+
+
+def test_should_group_missing_keys_under_none():
+    users = [{"name": "Alice"}]
+
+    result = group_by(users, "role")
+
+    assert result[None] == users
+
+
+def test_should_group_all_items_in_one_group():
+    users = [
+        {"name": "Alice", "role": "dev"},
+        {"name": "Bob", "role": "dev"},
+    ]
+
+    result = group_by(users, "role")
+
+    assert len(result["dev"]) == 2
+
+
+def test_should_reject_invalid_group_input():
+    import pytest
+
+    with pytest.raises(ValueError):
+        group_by("invalid", "role")

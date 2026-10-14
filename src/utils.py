@@ -92,3 +92,28 @@ def parse_price(value):
         return None
 
     return float(price)
+
+
+def group_by(array, key):
+    """Regroupe des dictionnaires selon une clé."""
+    if array is None:
+        return {}
+
+    if not isinstance(array, list):
+        raise ValueError("Le paramètre doit être une liste")
+
+    groups = {}
+
+    for item in array:
+        if not isinstance(item, dict):
+            raise ValueError("Chaque élément doit être un dictionnaire")
+
+        value = item.get(key)
+
+        try:
+            groups.setdefault(value, []).append(item)
+        except TypeError as exc:
+            raise ValueError("Clé de regroupement non hashable") from exc
+
+    return groups
+
