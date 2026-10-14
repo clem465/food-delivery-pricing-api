@@ -170,3 +170,33 @@ def test_should_default_to_ascending_order():
     assert [s["name"] for s in result] == [
         "Alice", "Bob", "Charlie"
     ]
+
+def test_should_parse_decimal_string():
+    assert parse_price("12.99") == 12.99
+
+def test_should_parse_comma_decimal():
+    assert parse_price("12,99") == 12.99
+
+def test_should_parse_price_with_suffix_euro():
+    assert parse_price("12.99 €") == 12.99
+
+def test_should_parse_price_with_prefix_euro():
+    assert parse_price("€12.99") == 12.99
+
+def test_should_accept_numeric_price():
+    assert parse_price(12.99) == 12.99
+
+def test_should_convert_free_to_zero():
+    assert parse_price("gratuit") == 0
+
+def test_should_reject_invalid_price():
+    assert parse_price("abc") is None
+
+def test_should_reject_negative_price():
+    assert parse_price("-5.00") is None
+
+def test_should_reject_null_price():
+    assert parse_price(None) is None
+
+def test_should_reject_boolean_price():
+    assert parse_price(True) is None
