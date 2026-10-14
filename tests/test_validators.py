@@ -37,6 +37,16 @@ def test_should_reject_null_email():
     assert is_valid_email(None) is False
 
 
+def test_should_reject_email_with_domain_but_without_at():
+    # Arrange
+    email = "userexample.com"
+
+    # Act
+    result = is_valid_email(email)
+
+    # Assert
+    assert result is False
+
 # ========================================
 # TESTS PASSWORD (8 tests)
 # ========================================
