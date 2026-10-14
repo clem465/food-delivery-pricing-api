@@ -2,8 +2,6 @@
 import re
 import unicodedata
 
-from decimal import Decimal, InvalidOperation
-
 
 def capitalize(text):
     if text is None or text == "":
@@ -63,34 +61,3 @@ def sort_students(students, sort_by, order="asc"):
         reverse=reverse,
     )
 
-
-def parse_price(value):
-    """Convertit un prix en nombre ou retourne None."""
-    if isinstance(value, bool) or value is None:
-        return None
-
-    if isinstance(value, (int, float, Decimal)):
-        try:
-            price = Decimal(str(value))
-        except InvalidOperation:
-            return None
-    elif isinstance(value, str):
-        text = value.strip().lower()
-
-        if text == "gratuit":
-            return 0
-
-        text = text.replace("€", "").strip()
-        text = text.replace(",", ".")
-
-        if not re.fullmatch(r"\d+(\.\d+)?", text):
-            return None
-
-        price = Decimal(text)
-    else:
-        return None
-
-    if not price.is_finite() or price < 0:
-        return None
-
-    return float(price)
