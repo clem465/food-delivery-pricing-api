@@ -43,3 +43,100 @@ def test_should_calculate_delivery_fee(
 def test_should_reject_invalid_delivery(distance, weight):
     with pytest.raises(ValueError):
         calculate_delivery_fee(distance, weight)
+
+
+PROMOS = [
+    {
+        "code": "P20",
+        "type": "percentage",
+        "value": 20,
+        "minOrder": 15,
+        "expiresAt": "2026-12-31",
+    },
+    {
+        "code": "F5",
+        "type": "fixed",
+        "value": 5,
+        "minOrder": 10,
+        "expiresAt": "2026-12-31",
+    },
+    {
+        "code": "F10",
+        "type": "fixed",
+        "value": 10,
+        "minOrder": 0,
+        "expiresAt": "2026-12-31",
+    },
+    {
+        "code": "FREE",
+        "type": "percentage",
+        "value": 100,
+        "minOrder": 0,
+        "expiresAt": "2026-12-31",
+    },
+    {
+        "code": "OLD",
+        "type": "percentage",
+        "value": 10,
+        "minOrder": 0,
+        "expiresAt": "2020-01-01",
+    },
+]
+
+TODAY = date(2026, 10, 14)
+
+
+@pytest.mark.parametrize(
+    ("subtotal", "code", "expected"),
+    [
+        (50, "P20", 40),
+        (30, "F5", 25),
+        (15, "P20", 12),
+        (5, "F10", 0),
+        (50, "FREE", 0),
+        (0, None, 0),
+        (50, "", 50),
+        (0, "FREE", 0),
+    ],
+)
+def test_should_apply_promotion(subtotal, code, expected):
+    result = apply_promo_code(
+        subtotal, code, PROMOS, TODAY
+    )
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    ("subtotal", "code", "error"),
+    [
+        (50, "OLD", ValueError),
+        (10, "P20", ValueError),
+        (50, "UNKNOWN", LookupError),
+        (-10, "P20", ValueError),
+    ],
+)
+def test_should_reject_invalid_promotion(
+    subtotal, code, error
+):
+    with pytest.raises(error):
+        apply_promo_code(
+            subtotal, code, PROMOS, TODAY
+        )
+
+
+def test_should_accept_promo_expiring_today():
+    promos = [
+        {
+            "code": "TODAY",
+            "type": "fixed",
+            "value": 5,
+            "minOrder": 0,
+            "expiresAt": "2026-10-14",
+        }
+    ]
+
+    result = apply_promo_code(
+        20, "TODAY", promos, TODAY
+    )
+
+    assert result == 15
