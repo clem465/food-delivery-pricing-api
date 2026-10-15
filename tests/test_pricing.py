@@ -6,7 +6,6 @@ import pytest
 from src.pricing import (
     apply_promo_code,
     calculate_delivery_fee,
-    calculate_order_total,
     calculate_surge,
 )
 
@@ -140,3 +139,37 @@ def test_should_accept_promo_expiring_today():
     )
 
     assert result == 15
+
+
+@pytest.mark.parametrize(
+    ("hour", "day", "expected"),
+    [
+        (15, "tuesday", 1.0),
+        (12.5, "wednesday", 1.3),
+        (20, "thursday", 1.5),
+        (21, "friday", 1.8),
+        (20, "saturday", 1.8),
+        (14, "sunday", 1.2),
+        (11.5, "monday", 1.0),
+        (19, "monday", 1.5),
+        (22, "friday", 0),
+        (9.99, "monday", 0),
+        (10, "monday", 1.0),
+        (13.5, "tuesday", 1.0),
+    ],
+)
+def test_should_calculate_surge(hour, day, expected):
+    assert calculate_surge(hour, day) == expected
+
+
+@pytest.mark.parametrize(
+    ("hour", "day"),
+    [
+        (-1, "monday"),
+        (24, "monday"),
+        (12, "invalid"),
+    ],
+)
+def test_should_reject_invalid_surge(hour, day):
+    with pytest.raises(ValueError):
+        calculate_surge(hour, day)
