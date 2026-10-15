@@ -6,6 +6,7 @@ import pytest
 from src.pricing import (
     apply_promo_code,
     calculate_delivery_fee,
+    calculate_order_total,
     calculate_surge,
 )
 
@@ -173,3 +174,120 @@ def test_should_calculate_surge(hour, day, expected):
 def test_should_reject_invalid_surge(hour, day):
     with pytest.raises(ValueError):
         calculate_surge(hour, day)
+
+
+ITEMS = [
+    {"name": "Pizza", "price": 12.50, "quantity": 2}
+]
+
+
+def test_should_calculate_normal_order():
+    result = calculate_order_total(
+        ITEMS, 5, 2, hour=15, day_of_week="tuesday"
+    )
+
+    assert result == {
+        "subtotal": 25,
+        "discount": 0,
+        "deliveryFee": 3,
+        "surge": 1.0,
+        "total": 28,
+    }
+
+
+def test_should_apply_promo_to_order():
+    result = calculate_order_total(
+        ITEMS, 5, 2,
+        promo_code="P20",
+        hour=15,
+        day_of_week="tuesday",
+        promo_codes=PROMOS,
+        today=TODAY,
+    )
+
+    assert result["discount"] == 5
+    assert result["total"] == 23
+
+
+def test_should_apply_surge_only_to_delivery():
+    result = calculate_order_total(
+        ITEMS, 5, 2,
+        hour=20,
+        day_of_week="friday",
+    )
+
+    assert result["deliveryFee"] == 5.40
+    assert result["subtotal"] == 25
+    assert result["total"] == 30.40
+
+
+@pytest.mark.parametrize(
+    ("items", "distance", "weight", "hour"),
+    [
+        ([], 5, 2, 15),
+        ([{"price": -1, "quantity": 1}], 5, 2, 15),
+        ([{"price": 10, "quantity": 0}], 5, 2, 15),
+        (ITEMS, 5, 2, 23),
+        (ITEMS, 15, 2, 15),
+        (ITEMS, 5, -1, 15),
+        (None, 5, 2, 15),
+    ],
+)
+def test_should_reject_invalid_order(
+    items, distance, weight, hour
+):
+    with pytest.raises(ValueError):
+        calculate_order_total(
+            items, distance, weight,
+            hour=hour,
+            day_of_week="tuesday",
+        )
+
+
+def test_should_round_all_amounts():
+    items = [
+        {"name": "Product", "price": 3.333, "quantity": 3}
+    ]
+
+    result = calculate_order_total(
+        items, 4.333, 1,
+        hour=15,
+        day_of_week="tuesday",
+    )
+
+    for key in (
+        "subtotal", "discount", "deliveryFee", "total"
+    ):
+        value = result[key]
+        assert round(value, 2) == value
+
+
+def test_should_return_expected_keys():
+    result = calculate_order_total(
+        ITEMS, 2, 1,
+        hour=15,
+        day_of_week="tuesday",
+    )
+
+    assert set(result.keys()) == {
+        "subtotal",
+        "discount",
+        "deliveryFee",
+        "surge",
+        "total",
+    }
+
+
+def test_should_not_modify_original_items():
+    items = [
+        {"name": "Pizza", "price": 12.5, "quantity": 2}
+    ]
+    original = [item.copy() for item in items]
+
+    calculate_order_total(
+        items, 2, 1,
+        hour=15,
+        day_of_week="tuesday",
+    )
+
+    assert items == original
