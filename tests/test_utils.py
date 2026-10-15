@@ -1,6 +1,8 @@
+import pytest
 
 from src.utils import (
     calculate_average,
+    calculate_discount,
     capitalize,
     clamp,
     group_by,
@@ -202,7 +204,7 @@ def test_should_reject_invalid_price():
     assert parse_price("abc") is None
 
 
-def test_should_reject_negative_price():
+def test_should_reject_negative_price_in_parse_price():
     assert parse_price("-5.00") is None
 
 
@@ -260,3 +262,66 @@ def test_should_reject_invalid_group_input():
 
     with pytest.raises(ValueError):
         group_by("invalid", "role")
+
+
+def test_should_apply_percentage_discount():
+    result = calculate_discount(
+        100, [{"type": "percentage", "value": 10}]
+    )
+    assert result == 90
+
+
+def test_should_apply_fixed_discount():
+    result = calculate_discount(
+        30, [{"type": "fixed", "value": 5}]
+    )
+    assert result == 25
+
+
+def test_should_apply_cumulative_discounts():
+    rules = [
+        {"type": "percentage", "value": 10},
+        {"type": "fixed", "value": 5},
+    ]
+
+    assert calculate_discount(100, rules) == 85
+
+
+def test_should_never_return_negative_total():
+    rules = [{"type": "fixed", "value": 50}]
+
+    assert calculate_discount(10, rules) == 0
+
+
+def test_should_apply_buy_three_get_one():
+    rules = [
+        {
+            "type": "buyXgetY",
+            "buy": 3,
+            "free": 1,
+            "itemPrice": 10,
+        }
+    ]
+
+    assert calculate_discount(40, rules) == 30
+
+
+def test_should_return_original_price_without_rules():
+    assert calculate_discount(50, []) == 50
+
+
+def test_should_reject_negative_price_in_discount():
+    with pytest.raises(ValueError):
+        calculate_discount(-10, [])
+
+
+def test_should_reject_unknown_discount():
+    with pytest.raises(ValueError):
+        calculate_discount(100, [{"type": "unknown"}])
+
+
+def test_should_reject_percentage_above_hundred():
+    with pytest.raises(ValueError):
+        calculate_discount(
+            100, [{"type": "percentage", "value": 150}]
+        )

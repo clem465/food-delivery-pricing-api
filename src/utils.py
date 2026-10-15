@@ -117,3 +117,70 @@ def group_by(array, key):
 
     return groups
 
+
+def calculate_discount(price, discount_rules):
+    """Applique des réductions cumulatives dans l'ordre."""
+    if (
+        isinstance(price, bool)
+        or not isinstance(price, (int, float))
+        or not 0 <= price < float("inf")
+    ):
+        raise ValueError("Prix invalide")
+
+    if not isinstance(discount_rules, list):
+        raise ValueError("Règles invalides")
+
+    total = Decimal(str(price))
+
+    for rule in discount_rules:
+        if not isinstance(rule, dict):
+            raise ValueError("Règle invalide")
+
+        rule_type = rule.get("type")
+
+        if rule_type in ("percentage", "fixed"):
+            value = rule.get("value")
+
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not 0 <= value < float("inf")
+            ):
+                raise ValueError("Réduction invalide")
+
+            value = Decimal(str(value))
+
+            if rule_type == "percentage":
+                if value > 100:
+                    raise ValueError("Pourcentage supérieur à 100")
+                total *= 1 - value / 100
+            else:
+                total -= value
+
+        elif rule_type == "buyXgetY":
+            buy = rule.get("buy")
+            free = rule.get("free")
+            item_price = rule.get("itemPrice")
+
+            if (
+                type(buy) is not int
+                or type(free) is not int
+                or buy <= 0
+                or free <= 0
+                or isinstance(item_price, bool)
+                or not isinstance(item_price, (int, float))
+                or not 0 < item_price < float("inf")
+            ):
+                raise ValueError("Offre buyXgetY invalide")
+
+            unit_price = Decimal(str(item_price))
+            quantity = int(total // unit_price)
+            groups = quantity // (buy + free)
+            total -= groups * free * unit_price
+
+        else:
+            raise ValueError("Type de réduction inconnu")
+
+        total = max(Decimal("0"), total)
+
+    return float(round(total, 2))
