@@ -1,4 +1,3 @@
-
 from src.validators import (
     is_valid_age,
     is_valid_email,
@@ -8,6 +7,7 @@ from src.validators import (
 # ========================================
 # TESTS EMAIL (7 tests)
 # ========================================
+
 
 def test_should_accept_valid_email():
     assert is_valid_email("user@example.com") is True
@@ -47,9 +47,11 @@ def test_should_reject_email_with_domain_but_without_at():
     # Assert
     assert result is False
 
+
 # ========================================
 # TESTS PASSWORD (8 tests)
 # ========================================
+
 
 def test_should_accept_valid_password():
     result = is_valid_password("Passw0rd!")
@@ -115,6 +117,7 @@ def test_should_reject_null_password():
 # ========================================
 # TESTS AGE (8 tests)
 # ========================================
+
 
 def test_should_accept_valid_age():
     assert is_valid_age(25) is True

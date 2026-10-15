@@ -1,4 +1,3 @@
-
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
@@ -37,10 +36,7 @@ def money(value):
 
 
 def valid_number(value):
-    return (
-        type(value) in (int, float)
-        and 0 <= value < float("inf")
-    )
+    return type(value) in (int, float) and 0 <= value < float("inf")
 
 
 def calculate_delivery_fee(distance, weight):
@@ -53,9 +49,7 @@ def calculate_delivery_fee(distance, weight):
     fee = Decimal("2.00")
 
     if distance > 3:
-        fee += (
-            Decimal(str(distance)) - Decimal("3")
-        ) * Decimal("0.50")
+        fee += (Decimal(str(distance)) - Decimal("3")) * Decimal("0.50")
 
     if weight > 5:
         fee += Decimal("1.50")
@@ -138,8 +132,13 @@ def calculate_surge(hour, day_of_week):
     day = day_of_week.lower()
 
     valid_days = (
-        "monday", "tuesday", "wednesday",
-        "thursday", "friday", "saturday", "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
     )
 
     if day not in valid_days:
@@ -211,18 +210,11 @@ def calculate_order_total(
         today=today,
     )
 
-    discount = money(
-        Decimal(str(subtotal)) - Decimal(str(discounted))
-    )
+    discount = money(Decimal(str(subtotal)) - Decimal(str(discounted)))
 
-    delivery_fee = money(
-        Decimal(str(delivery)) * Decimal(str(surge))
-    )
+    delivery_fee = money(Decimal(str(delivery)) * Decimal(str(surge)))
 
-    total = money(
-        Decimal(str(discounted))
-        + Decimal(str(delivery_fee))
-    )
+    total = money(Decimal(str(discounted)) + Decimal(str(delivery_fee)))
 
     return {
         "subtotal": subtotal,

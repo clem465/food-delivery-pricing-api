@@ -13,6 +13,7 @@ from src.utils import (
 
 # CAPITALIZE
 
+
 def test_should_capitalize_lowercase_word():
     # Arrange
     text = "hello"
@@ -38,6 +39,7 @@ def test_should_return_empty_string_when_null():
 
 # CALCULATE AVERAGE
 
+
 def test_should_calculate_average_of_three_numbers():
     assert calculate_average([10, 12, 14]) == 12
 
@@ -60,6 +62,7 @@ def test_should_calculate_average_with_decimals():
 
 # SLUGIFY
 
+
 def test_should_convert_spaces_to_hyphens():
     assert slugify("Hello World") == "hello-world"
 
@@ -78,6 +81,7 @@ def test_should_return_empty_slug_when_empty():
 
 # CLAMP
 
+
 def test_should_keep_value_inside_range():
     assert clamp(5, 0, 10) == 5
 
@@ -93,6 +97,7 @@ def test_should_return_maximum_when_above_range():
 def test_should_handle_equal_bounds():
     assert clamp(0, 0, 0) == 0
 
+
 def test_should_sort_students_by_grade_ascending():
     # Arrange
     students = [
@@ -105,10 +110,9 @@ def test_should_sort_students_by_grade_ascending():
     result = sort_students(students, "grade", "asc")
 
     # Assert
-    assert [student["grade"] for student in result] == [
-        10, 15, 18
-    ]
-    
+    assert [student["grade"] for student in result] == [10, 15, 18]
+
+
 def test_should_sort_students_by_grade_descending():
     students = [
         {"name": "Alice", "grade": 15, "age": 20},
@@ -120,6 +124,7 @@ def test_should_sort_students_by_grade_descending():
 
     assert [s["grade"] for s in result] == [18, 15, 10]
 
+
 def test_should_sort_students_by_name_ascending():
     students = [
         {"name": "Charlie", "grade": 18, "age": 19},
@@ -129,9 +134,8 @@ def test_should_sort_students_by_name_ascending():
 
     result = sort_students(students, "name", "asc")
 
-    assert [s["name"] for s in result] == [
-        "Alice", "Bob", "Charlie"
-    ]
+    assert [s["name"] for s in result] == ["Alice", "Bob", "Charlie"]
+
 
 def test_should_sort_students_by_age_ascending():
     students = [
@@ -144,11 +148,14 @@ def test_should_sort_students_by_age_ascending():
 
     assert [s["age"] for s in result] == [19, 20, 22]
 
+
 def test_should_return_empty_array_when_students_null():
     assert sort_students(None, "grade") == []
 
+
 def test_should_return_empty_array_when_students_empty():
     assert sort_students([], "grade") == []
+
 
 def test_should_not_modify_original_students():
     students = [
@@ -162,6 +169,7 @@ def test_should_not_modify_original_students():
 
     assert students == original
 
+
 def test_should_default_to_ascending_order():
     students = [
         {"name": "Charlie", "grade": 18, "age": 19},
@@ -171,10 +179,8 @@ def test_should_default_to_ascending_order():
 
     result = sort_students(students, "name")
 
-    assert [s["name"] for s in result] == [
-        "Alice", "Bob", "Charlie"
-    ]
-    
+    assert [s["name"] for s in result] == ["Alice", "Bob", "Charlie"]
+
 
 def test_should_parse_decimal_string():
     assert parse_price("12.99") == 12.99
@@ -265,16 +271,12 @@ def test_should_reject_invalid_group_input():
 
 
 def test_should_apply_percentage_discount():
-    result = calculate_discount(
-        100, [{"type": "percentage", "value": 10}]
-    )
+    result = calculate_discount(100, [{"type": "percentage", "value": 10}])
     assert result == 90
 
 
 def test_should_apply_fixed_discount():
-    result = calculate_discount(
-        30, [{"type": "fixed", "value": 5}]
-    )
+    result = calculate_discount(30, [{"type": "fixed", "value": 5}])
     assert result == 25
 
 
@@ -322,6 +324,4 @@ def test_should_reject_unknown_discount():
 
 def test_should_reject_percentage_above_hundred():
     with pytest.raises(ValueError):
-        calculate_discount(
-            100, [{"type": "percentage", "value": 150}]
-        )
+        calculate_discount(100, [{"type": "percentage", "value": 150}])

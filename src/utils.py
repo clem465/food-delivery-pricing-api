@@ -1,4 +1,3 @@
-
 import re
 import unicodedata
 from decimal import Decimal, InvalidOperation
@@ -23,10 +22,7 @@ def slugify(text):
         return ""
 
     text = unicodedata.normalize("NFKD", text)
-    text = "".join(
-        char for char in text
-        if not unicodedata.combining(char)
-    )
+    text = "".join(char for char in text if not unicodedata.combining(char))
 
     text = text.lower().strip()
     text = re.sub(r"[^a-z0-9\s-]", "", text)
@@ -61,6 +57,7 @@ def sort_students(students, sort_by, order="asc"):
         key=lambda student: student[sort_by],
         reverse=reverse,
     )
+
 
 def parse_price(value):
     """Convertit un prix en nombre ou retourne None."""

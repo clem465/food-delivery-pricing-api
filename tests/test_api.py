@@ -1,9 +1,7 @@
-
 import pytest
 from fastapi.testclient import TestClient
 
 from src.app import app, orders, reset_orders
-
 
 client = TestClient(app)
 
@@ -30,9 +28,7 @@ def clean_orders():
 
 
 def test_should_simulate_normal_order():
-    response = client.post(
-        "/orders/simulate", json=VALID_ORDER
-    )
+    response = client.post("/orders/simulate", json=VALID_ORDER)
 
     assert response.status_code == 200
     assert response.json()["total"] == 28
@@ -146,14 +142,16 @@ def test_should_return_404_for_unknown_order():
 def test_should_return_complete_order_structure():
     created = client.post("/orders", json=VALID_ORDER)
 
-    response = client.get(
-        f"/orders/{created.json()['id']}"
-    )
+    response = client.get(f"/orders/{created.json()['id']}")
 
     assert {
-        "id", "items", "subtotal",
-        "discount", "deliveryFee",
-        "surge", "total",
+        "id",
+        "items",
+        "subtotal",
+        "discount",
+        "deliveryFee",
+        "surge",
+        "total",
     }.issubset(response.json().keys())
 
 

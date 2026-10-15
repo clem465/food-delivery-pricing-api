@@ -1,4 +1,3 @@
-
 from copy import deepcopy
 from datetime import date
 
@@ -113,10 +112,7 @@ def validate_promo(data: PromoRequest):
             detail="Code promo obligatoire",
         )
 
-    if not any(
-        promo["code"] == data.code
-        for promo in PROMO_CODES
-    ):
+    if not any(promo["code"] == data.code for promo in PROMO_CODES):
         raise HTTPException(
             status_code=404,
             detail="Code promo inconnu",

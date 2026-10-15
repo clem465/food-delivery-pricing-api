@@ -1,4 +1,3 @@
-
 from datetime import date
 
 import pytest
@@ -25,9 +24,7 @@ from src.pricing import (
         (10, 6, 7.00),
     ],
 )
-def test_should_calculate_delivery_fee(
-    distance, weight, expected
-):
+def test_should_calculate_delivery_fee(distance, weight, expected):
     assert calculate_delivery_fee(distance, weight) == expected
 
 
@@ -100,9 +97,7 @@ TODAY = date(2026, 10, 14)
     ],
 )
 def test_should_apply_promotion(subtotal, code, expected):
-    result = apply_promo_code(
-        subtotal, code, PROMOS, TODAY
-    )
+    result = apply_promo_code(subtotal, code, PROMOS, TODAY)
     assert result == expected
 
 
@@ -115,13 +110,9 @@ def test_should_apply_promotion(subtotal, code, expected):
         (-10, "P20", ValueError),
     ],
 )
-def test_should_reject_invalid_promotion(
-    subtotal, code, error
-):
+def test_should_reject_invalid_promotion(subtotal, code, error):
     with pytest.raises(error):
-        apply_promo_code(
-            subtotal, code, PROMOS, TODAY
-        )
+        apply_promo_code(subtotal, code, PROMOS, TODAY)
 
 
 def test_should_accept_promo_expiring_today():
@@ -135,9 +126,7 @@ def test_should_accept_promo_expiring_today():
         }
     ]
 
-    result = apply_promo_code(
-        20, "TODAY", promos, TODAY
-    )
+    result = apply_promo_code(20, "TODAY", promos, TODAY)
 
     assert result == 15
 
@@ -176,15 +165,11 @@ def test_should_reject_invalid_surge(hour, day):
         calculate_surge(hour, day)
 
 
-ITEMS = [
-    {"name": "Pizza", "price": 12.50, "quantity": 2}
-]
+ITEMS = [{"name": "Pizza", "price": 12.50, "quantity": 2}]
 
 
 def test_should_calculate_normal_order():
-    result = calculate_order_total(
-        ITEMS, 5, 2, hour=15, day_of_week="tuesday"
-    )
+    result = calculate_order_total(ITEMS, 5, 2, hour=15, day_of_week="tuesday")
 
     assert result == {
         "subtotal": 25,
@@ -197,7 +182,9 @@ def test_should_calculate_normal_order():
 
 def test_should_apply_promo_to_order():
     result = calculate_order_total(
-        ITEMS, 5, 2,
+        ITEMS,
+        5,
+        2,
         promo_code="P20",
         hour=15,
         day_of_week="tuesday",
@@ -211,7 +198,9 @@ def test_should_apply_promo_to_order():
 
 def test_should_apply_surge_only_to_delivery():
     result = calculate_order_total(
-        ITEMS, 5, 2,
+        ITEMS,
+        5,
+        2,
         hour=20,
         day_of_week="friday",
     )
@@ -233,38 +222,38 @@ def test_should_apply_surge_only_to_delivery():
         (None, 5, 2, 15),
     ],
 )
-def test_should_reject_invalid_order(
-    items, distance, weight, hour
-):
+def test_should_reject_invalid_order(items, distance, weight, hour):
     with pytest.raises(ValueError):
         calculate_order_total(
-            items, distance, weight,
+            items,
+            distance,
+            weight,
             hour=hour,
             day_of_week="tuesday",
         )
 
 
 def test_should_round_all_amounts():
-    items = [
-        {"name": "Product", "price": 3.333, "quantity": 3}
-    ]
+    items = [{"name": "Product", "price": 3.333, "quantity": 3}]
 
     result = calculate_order_total(
-        items, 4.333, 1,
+        items,
+        4.333,
+        1,
         hour=15,
         day_of_week="tuesday",
     )
 
-    for key in (
-        "subtotal", "discount", "deliveryFee", "total"
-    ):
+    for key in ("subtotal", "discount", "deliveryFee", "total"):
         value = result[key]
         assert round(value, 2) == value
 
 
 def test_should_return_expected_keys():
     result = calculate_order_total(
-        ITEMS, 2, 1,
+        ITEMS,
+        2,
+        1,
         hour=15,
         day_of_week="tuesday",
     )
@@ -279,13 +268,13 @@ def test_should_return_expected_keys():
 
 
 def test_should_not_modify_original_items():
-    items = [
-        {"name": "Pizza", "price": 12.5, "quantity": 2}
-    ]
+    items = [{"name": "Pizza", "price": 12.5, "quantity": 2}]
     original = [item.copy() for item in items]
 
     calculate_order_total(
-        items, 2, 1,
+        items,
+        2,
+        1,
         hour=15,
         day_of_week="tuesday",
     )
